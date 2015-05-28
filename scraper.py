@@ -25,11 +25,11 @@ def scrape_season(url):
     for episode in episodes:
         
         ep_data = episode.text.split(',')
-        ep_num = ep_data[0][5:len(ep_data[0])]
+        ep_num = ep_data[0][1:]
 
         #Fuck this is messy
-        air_data = ep_data[1].split('-')
-        air_date = datetime.date (int (air_data[0][12:len(air_data[0])]), int(air_data[1]), int(air_data[2]))
+        air_data = ep_data[1].replace(u'\xa0', '-').split('-')[1:]
+        air_date = datetime.date (int(air_data[0]), int(air_data[1]), int(air_data[2]))
         timestamp = time.mktime(air_date.timetuple())
 
         scrape_episode(episode['href'], ep_num, timestamp)
