@@ -69,13 +69,17 @@ def get_clue_attribs(clue, cats):
         answer = answer_soup.find('em', {"class" : "correct_response"}).text
         
         clue_props = mouseover_js[1].split("_") #contains the unique ID of the clue for this specific game
-                                                #format: clue_["DJ"||"J"]_[Category(1-6)]_[Row(1-5)]
+                                                #format: clue_["DJ"||"J"]_[Category(1-6)]_[Row(1-5)]||clue_["FJ"]
                                                 
-        #Now to figure out the category
-        cat = cats[int(clue_props[2])-1]
-
+        cat_n = int(clue_props[2])-1
         #Are we in double jeopardy?
-        dj = clue_props[1] == "DJ"
+        
+        if clue_props[1] == "J":
+            cat = cats[cat_n]
+        elif clue_props[1] == "DJ":
+            cat = cats[cat_n+6]
+        elif clue_props[1] == "FJ":
+            cat = cats[-1]
 
         #The class name for the dollar value varies if it's a daily double
         dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
