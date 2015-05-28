@@ -1,4 +1,4 @@
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 import scraperwiki
 import datetime
 import time
@@ -15,7 +15,7 @@ def scrape_all_seasons(url):
     soup = BeautifulSoup(scraperwiki.scrape(url))
     
     #Grab all of the seasons listed
-    seasons = soup.find('div', {"id":"content"}).findAll('a')
+    seasons = soup.find('div', {"id":"content"}).find_all('a')
     for season in seasons:
         scrape_season(base_url+season['href'])
 
