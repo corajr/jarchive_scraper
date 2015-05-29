@@ -56,40 +56,40 @@ def scrape_episode(url, episode, air_date):
             scraperwiki.sql.save(['uid'], clue_attribs)
             
 
+def extract_mouseover(parent):
+    mouseover_js = parent['onmouseover'].split(",", 2)
+    answer_soup = BeautifulSoup(mouseover_js[2])
+    answer = answer_soup.find('em', {"class" : re.compile("correct_response")}).text
+
+    clue_props = mouseover_js[1].split("_") #contains the unique ID of the clue for this specific game
+                                            #format: clue_["DJ"||"J"]_[Category(1-6)]_[Row(1-5)]||clue_["FJ"]
+    return answer, clue_props
 
 def get_clue_attribs(clue, cats):
     #Because of the way jarchive hides the answers to clues
     #this is here to keep things a bit more tidy
     div = clue.find('div')
     
-    if div:
-        #Split the JS statement into it's arguments so we can extract the html from the final argument
-        mouseover_js = div['onmouseover'].split(",",2)
-        answer_soup = BeautifulSoup(mouseover_js[2]) #We need to go... deeper
-        answer = answer_soup.find('em', {"class" : "correct_response"}).text
-        
-        clue_props = mouseover_js[1].split("_") #contains the unique ID of the clue for this specific game
-                                                #format: clue_["DJ"||"J"]_[Category(1-6)]_[Row(1-5)]||clue_["FJ"]
-                                                
-        
-        cat_n = int(clue_props[2])-1 if len(clue_props) > 3 else None
+    if div: # J or DJ
+        answer, clue_props = extract_mouseover(div)                                   
+        cat_n = int(clue_props[2])-1
         #Are we in double jeopardy?
-        
+
         if clue_props[1] == "J":
             cat = cats[cat_n]
         elif clue_props[1] == "DJ":
             cat = cats[cat_n+6]
-        elif clue_props[1] == "FJ":
-            cat = cats[-1]
 
-        #The class name for the dollar value varies if it's a daily double
-        if clue_props[1] == "J" or clue_props[1] == "DJ":
-            dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
-        else:
-            dollar_value = "FJ"
-        clue_text = clue.find(attrs={"class" : "clue_text"}).text
+        dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
+    else: # FJ
+        parent = clue.find_parent('table', {"class": 'final_round'})
+        answer, clue_props = extract_mouseover(parent.find('div'))
+        cat = cats[-1]
+        dollar_value = "FJ"
+
+    clue_text = clue.find(attrs={"class" : "clue_text"}).text
         
-        return {"answer" : answer, "category" : cat, "text" : clue_text, "dollar_value": dollar_value}
+    return {"answer" : answer, "category" : cat, "text" : clue_text, "dollar_value": dollar_value}
 
 if __name__ == '__main__':
     scrape_all_seasons(seasons_url)
