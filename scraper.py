@@ -3,6 +3,7 @@ import scraperwiki
 import datetime
 import time
 import re
+import sys
 
 seasons_url = 'http://www.j-archive.com/listseasons.php'
 base_url = 'http://www.j-archive.com/'
@@ -83,6 +84,10 @@ def get_clue_attribs(clue, cats):
         dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
     else: # FJ
         parent = clue.find_parent('table', {"class": 'final_round'})
+        if parent is None:
+            print clue.prettify()
+            sys.exit(1)
+            return None
         answer, clue_props = extract_mouseover(parent.find('div'))
         cat = cats[-1]
         dollar_value = "FJ"
