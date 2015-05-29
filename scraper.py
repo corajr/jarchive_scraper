@@ -91,4 +91,5 @@ def get_clue_attribs(clue, cats):
         
         return {"answer" : answer, "category" : cat, "text" : clue_text, "dollar_value": dollar_value}
 
-scrape_all_seasons(seasons_url)
+if __name__ == '__main__':
+    scrape_all_seasons(seasons_url)
