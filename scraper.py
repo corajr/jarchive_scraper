@@ -83,7 +83,10 @@ def get_clue_attribs(clue, cats):
             cat = cats[-1]
 
         #The class name for the dollar value varies if it's a daily double
-        dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
+        if clue_props[1] == "J" or clue_props[1] == "DJ":
+            dollar_value = clue.find(attrs={"class" : re.compile('clue_value*')}).text
+        else:
+            dollar_value = "FJ"
         clue_text = clue.find(attrs={"class" : "clue_text"}).text
         
         return {"answer" : answer, "category" : cat, "text" : clue_text, "dollar_value": dollar_value}
