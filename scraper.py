@@ -71,7 +71,8 @@ def get_clue_attribs(clue, cats):
         clue_props = mouseover_js[1].split("_") #contains the unique ID of the clue for this specific game
                                                 #format: clue_["DJ"||"J"]_[Category(1-6)]_[Row(1-5)]||clue_["FJ"]
                                                 
-        cat_n = int(clue_props[2])-1
+        
+        cat_n = int(clue_props[2])-1 if len(clue_props) > 3 else None
         #Are we in double jeopardy?
         
         if clue_props[1] == "J":
